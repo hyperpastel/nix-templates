@@ -1,0 +1,5 @@
+# Folders created by the LSP
+target/
+.classpath
+.project
+.settings
