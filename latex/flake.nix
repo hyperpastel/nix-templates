@@ -41,6 +41,9 @@
               servers = { texlab = { enable = true; }; };
             };
           };
+
+          globals.maplocalleader = ".";
+
         };
 
         nvim = meow cfg_final;
