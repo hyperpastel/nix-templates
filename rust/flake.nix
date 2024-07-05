@@ -9,14 +9,12 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    kirara-nixvim.url = "github:hyperpastel/kirara-nixvim";
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk, fenix, kirara-nixvim }:
+  outputs = { self, nixpkgs, flake-utils, naersk, fenix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        lib = pkgs.lib;
         toolchain = fenix.packages.${system}.default.withComponents [
           "cargo"
           "clippy"
@@ -31,37 +29,12 @@
           rustc = toolchain;
         });
 
-        kirara = kirara-nixvim.lib.${system};
-
-        cfg = kirara.cfg;
-        meow = kirara.meow;
-
-        cfg_final = lib.attrsets.recursiveUpdate cfg {
-          plugins = {
-            lsp = {
-              enable = true;
-              servers = {
-                rust-analyzer = {
-                  enable = true;
-                  installRustc = false;
-                  installCargo = false;
-                };
-              };
-            };
-
-            treesitter.ensureInstalled = [ "rust" ];
-          };
-        };
-
-        nvim = meow cfg_final;
-
         shellPackages = [ toolchain ];
 
       in {
         packages.default = package;
         devShells = {
           default = pkgs.mkShell { packages = shellPackages; };
-          nvim = pkgs.mkShell { packages = shellPackages ++ [ nvim ]; };
         };
       });
 }
